@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <ingredients>
+        <ingredient name = "ingredient_apple">
+            <name name = "ingredient_name">Apple</name>
+            <image name = "ingredient_image">@drawable/apple</image>
+            <calories name = "ingredient_calories">52</calories>
+            <protein name = "ingredient_protein">0</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">14</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_banana">
+            <name name = "ingredient_name">Banana</name>
+            <image name = "ingredient_image">@drawable/banana</image>
+            <calories name = "ingredient_calories">89</calories>
+            <protein name = "ingredient_protein">1</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">23</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_blueberry">
+            <name name = "ingredient_name">Blueberry</name>
+            <image name = "ingredient_image">@drawable/blueberries</image>
+            <calories name = "ingredient_calories">57</calories>
+            <protein name = "ingredient_protein">1</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">14</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_cabbage">
+            <name name = "ingredient_name">Cabbage</name>
+            <image name = "ingredient_image">@drawable/cabbage</image>
+            <calories name = "ingredient_calories">24</calories>
+            <protein name = "ingredient_protein">1</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">6</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_cheese">
+            <name name = "ingredient_name">Cheese</name>
+            <image name = "ingredient_image">@drawable/cheese</image>
+            <calories name = "ingredient_calories">402</calories>
+            <protein name = "ingredient_protein">25</protein>
+            <fat name = "ingredient_fat">33</fat>
+            <carbs name = "ingredient_carbs">0</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_chicken_breast">
+            <name name = "ingredient_name">Chicken Breast</name>
+            <image name = "ingredient_image">@drawable/chickenbreast</image>
+            <calories name = "ingredient_calories">164</calories>
+            <protein name = "ingredient_protein">31</protein>
+            <fat name = "ingredient_fat">4</fat>
+            <carbs name = "ingredient_carbs">0</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_cucumber">
+            <name name = "ingredient_name">Cucumber</name>
+            <image name = "ingredient_image">@drawable/cucumber</image>
+            <calories name = "ingredient_calories">15</calories>
+            <protein name = "ingredient_protein">1</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">4</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_garlic">
+            <name name = "ingredient_name">Garlic</name>
+            <image name = "ingredient_image">@drawable/garlic</image>
+            <calories name = "ingredient_calories">149</calories>
+            <protein name = "ingredient_protein">6</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">33</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_mozzarella">
+            <name name = "ingredient_name">Mozzarella</name>
+            <image name = "ingredient_image">@drawable/mozzarella</image>
+            <calories name = "ingredient_calories">210</calories>
+            <protein name = "ingredient_protein">28</protein>
+            <fat name = "ingredient_fat">17</fat>
+            <carbs name = "ingredient_carbs">3</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_oatmeal">
+            <name name = "ingredient_name">Oatmeal</name>
+            <image name = "ingredient_image">@drawable/oatmeal</image>
+            <calories name = "ingredient_calories">389</calories>
+            <protein name = "ingredient_protein">17</protein>
+            <fat name = "ingredient_fat">7</fat>
+            <carbs name = "ingredient_carbs">66</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_onion">
+            <name name = "ingredient_name">Onion</name>
+            <image name = "ingredient_image">@drawable/onion</image>
+            <calories name = "ingredient_calories">42</calories>
+            <protein name = "ingredient_protein">1</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">10</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_orange">
+            <name name = "ingredient_name">Orange</name>
+            <image name = "ingredient_image">@drawable/orange</image>
+            <calories name = "ingredient_calories">47</calories>
+            <protein name = "ingredient_protein">1</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">12</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_pasta">
+            <name name = "ingredient_name">Pasta</name>
+            <image name = "ingredient_image">@drawable/pasta</image>
+            <calories name = "ingredient_calories">131</calories>
+            <protein name = "ingredient_protein">5</protein>
+            <fat name = "ingredient_fat">1</fat>
+            <carbs name = "ingredient_carbs">25</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_pork">
+            <name name = "ingredient_name">Pork</name>
+            <image name = "ingredient_image">@drawable/pork</image>
+            <calories name = "ingredient_calories">242</calories>
+            <protein name = "ingredient_protein">27</protein>
+            <fat name = "ingredient_fat">14</fat>
+            <carbs name = "ingredient_carbs">0</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_potato">
+            <name name = "ingredient_name">Potato</name>
+            <image name = "ingredient_image">@drawable/potato</image>
+            <calories name = "ingredient_calories">77</calories>
+            <protein name = "ingredient_protein">2</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">17</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_rice">
+            <name name = "ingredient_name">Rice</name>
+            <image name = "ingredient_image">@drawable/rice</image>
+            <calories name = "ingredient_calories">135</calories>
+            <protein name = "ingredient_protein">3</protein>
+            <fat name = "ingredient_fat">1</fat>
+            <carbs name = "ingredient_carbs">27</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_beef">
+            <name name = "ingredient_name">Beef</name>
+            <image name = "ingredient_image">@drawable/steak</image>
+            <calories name = "ingredient_calories">134</calories>
+            <protein name = "ingredient_protein">21</protein>
+            <fat name = "ingredient_fat">5</fat>
+            <carbs name = "ingredient_carbs">0</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_strawberry">
+            <name name = "ingredient_name">Strawberry</name>
+            <image name = "ingredient_image">@drawable/strawberry</image>
+            <calories name = "ingredient_calories">32</calories>
+            <protein name = "ingredient_protein">1</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">8</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+        <ingredient name = "ingredient_tomato">
+            <name name = "ingredient_name">Tomato</name>
+            <image name = "ingredient_image">@drawable/tomato</image>
+            <calories name = "ingredient_calories">52</calories>
+            <protein name = "ingredient_protein">0</protein>
+            <fat name = "ingredient_fat">0</fat>
+            <carbs name = "ingredient_carbs">14</carbs>
+            <base_weight name = "ingredient_weight">100</base_weight>
+        </ingredient>
+
+    </ingredients>
+</resources>

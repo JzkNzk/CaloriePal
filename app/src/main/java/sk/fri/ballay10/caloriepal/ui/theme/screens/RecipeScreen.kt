@@ -461,7 +461,7 @@ fun RecipeAddingScreen(onCancel: () -> Unit, onAddRecipe: (Recipe) -> Unit) {
             }
             // Open Interface for adding ingredients to the Recipe List
             if (chooseItemInterfaceVisible) {
-                IngredientChoosingScreen(ingredients = IngredietList.storedIngredients,
+                IngredientChoosingScreen(ingredients = IngredietList.ingredients,
                     onClose = {
                         chooseItemInterfaceVisible = false
                     },

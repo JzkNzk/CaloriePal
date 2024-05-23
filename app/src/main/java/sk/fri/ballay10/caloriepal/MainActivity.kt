@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import sk.fri.ballay10.caloriepal.objects.IngredietList
 import sk.fri.ballay10.caloriepal.roomdb.MealDatabase
 import sk.fri.ballay10.caloriepal.roomdb.NutrientSummaryDatabase
 import sk.fri.ballay10.caloriepal.roomdb.RecipeDatabase
@@ -39,7 +40,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        IngredietList.initializeIngredientListContext(this)
         //Databases
         recipeDatabase = Room.databaseBuilder(
             applicationContext,

@@ -40,7 +40,7 @@ import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
 
 @Composable
 fun IngredientScreen() {
-    val ingredients = IngredietList.storedIngredients
+    val ingredients = IngredietList.ingredients
     Scaffold(
         topBar = {
             TopDescriptionBar("INGREDIENTS")
