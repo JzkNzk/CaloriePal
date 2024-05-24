@@ -15,3 +15,5 @@ val colorBlue2 = Color(85, 158, 247, 255)
 
 val colorRed1 = Color(240, 110, 110)
 val colorRed2 = Color(240, 150, 150)
+
+val colorGreen1 = Color(67, 173, 59, 255)
