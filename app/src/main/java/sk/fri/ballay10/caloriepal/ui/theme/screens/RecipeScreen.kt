@@ -1,5 +1,7 @@
 package sk.fri.ballay10.caloriepal.ui.theme.screens
 
+import androidx.annotation.StringRes
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,6 +67,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import sk.fri.ballay10.caloriepal.data.ChoosenIngredient
 import sk.fri.ballay10.caloriepal.data.ChoosenRecipe
@@ -79,8 +86,12 @@ import sk.fri.ballay10.caloriepal.ui.theme.colorRed1
 import sk.fri.ballay10.caloriepal.ui.theme.colorRed2
 import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
 
+enum class RecipeScreen {
+    AddMeal,
+    AddRecipe,
+}
 @Composable
-fun RecipeScreen(viewModel: MealsAndRecipesViewModel, addMealToSummary: (Meal) -> Unit) {
+fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(), addMealToSummary: (Meal) -> Unit, moveToAddingScreen: (Int) -> Unit) {
     var btnColor by remember {
         mutableStateOf(colorBlue1)
     }
@@ -99,7 +110,7 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel, addMealToSummary: (Meal) -
         },
         floatingActionButton = {AddItemInTabButton(
             onClick = {
-                addingState = true
+                moveToAddingScreen(activeTab)
             },
             color = btnColor)}
     ) { innerPadding ->
@@ -120,24 +131,6 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel, addMealToSummary: (Meal) -
             }, onMealToSummary =  {
                 addMealToSummary(it)
             })
-        }
-        if (activeTab == 1 && addingState) {
-            RecipeAddingScreen(onCancel = {
-                addingState = false
-            }, onAddRecipe = {
-                //add recipe
-                viewModel.addRecipeToList(it)
-                addingState = false
-
-            })
-        }
-        if (activeTab == 0 && addingState) {
-            MealAddingScreen(onCancel = { addingState = false},
-                onAddMeal = {
-                    viewModel.addMealToList(it)
-                    addingState = false
-                },
-                viewModel = viewModel)
         }
     }
 
@@ -823,7 +816,9 @@ fun RecipeChoosingScreen(viewModel: MealsAndRecipesViewModel, onClose: () -> Uni
 @Composable
 fun BasicListEntry(ingredient: Ingredient, weight: Int, onRemoveItem: () -> Unit, removeable: Boolean) {
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.background(Color.White).padding(8.dp)) {
+        modifier = Modifier
+            .background(Color.White)
+            .padding(8.dp)) {
         Image(
             painter = painterResource(id = ingredient.imageRes),
             contentDescription = ingredient.name,
@@ -846,7 +841,9 @@ fun BasicListEntry(ingredient: Ingredient, weight: Int, onRemoveItem: () -> Unit
 @Composable
 fun RecipeListEntry(recipe: Recipe, amount: Int, onRemoveItem: () -> Unit, removeable: Boolean) {
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.background(Color.White).padding(8.dp)) {
+        modifier = Modifier
+            .background(Color.White)
+            .padding(8.dp)) {
         Text(text = recipe.name)
         Spacer(modifier = Modifier.weight(1f))
         Text(text = "Amount: $amount")

@@ -1,6 +1,5 @@
 package sk.fri.ballay10.caloriepal.ui.theme.screens
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,26 +12,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
@@ -41,59 +36,59 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gigamole.composeshadowsplus.common.shadowsPlus
 import sk.fri.ballay10.caloriepal.R
 import sk.fri.ballay10.caloriepal.ui.theme.ActionButtons
-import sk.fri.ballay10.caloriepal.ui.theme.EnterNameForm
 import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
-import sk.fri.ballay10.caloriepal.ui.theme.colorGreen1
-import sk.fri.ballay10.caloriepal.ui.theme.colorRed1
+import sk.fri.ballay10.caloriepal.ui.theme.EnterNameForm
+import sk.fri.ballay10.caloriepal.ui.theme.colorBlue1
+import sk.fri.ballay10.caloriepal.ui.theme.colorBlue2
 
 @Composable
-fun RecipeAddingScreen(modifier: Modifier = Modifier) {
+fun MealAddingScreen(modifier: Modifier = Modifier) {
     var isPickDialogVisible by rememberSaveable {
         mutableStateOf(false)
     }
 
     Scaffold (
-        topBar = { TopDescriptionBar(title = "Add recipe", bgColor = colorRed1) },
+        topBar = { TopDescriptionBar(title = "Add meal", bgColor = colorBlue1) },
         bottomBar = {}
 
     ){
         Column (
-            modifier
+            modifier = modifier
+                .fillMaxSize()
                 .padding(paddingValues = it)
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+
         ) {
-            EnterNameForm(nameOfWhat = stringResource(id = R.string.recipe_lowercase))
+            EnterNameForm(nameOfWhat = stringResource(id = R.string.meal_lowercase))
             Spacer(modifier = modifier.height(16.dp))
-            PickedIngredientList(onAddIngredient = {
+            PickedRecipeList(onAddRecipe = {
                 isPickDialogVisible = true
             })
             ActionButtons()
         }
         if (isPickDialogVisible) {
-            PickIngredientDialog(onCancel = {isPickDialogVisible = false})
+            PickRecipeDialog(onCancel = {isPickDialogVisible = false})
         }
     }
 }
 
 @Preview
 @Composable
-fun RecipeAddingScreenPreview(modifier: Modifier = Modifier) {
-    RecipeAddingScreen()
+fun MealAddingScreenPreview(modifier: Modifier = Modifier) {
+    MealAddingScreen()
 }
 
 @Composable
-fun PickedIngredientList(onAddIngredient: () -> Unit,modifier: Modifier = Modifier) {
+fun PickedRecipeList(onAddRecipe: () -> Unit,modifier: Modifier = Modifier) {
     Column (
         modifier = modifier
             .shadowsPlus()
@@ -109,13 +104,13 @@ fun PickedIngredientList(onAddIngredient: () -> Unit,modifier: Modifier = Modifi
             modifier = Modifier.weight(1f)
         ) {
             item {
-                IngredientEntry()
+                RecipeEntry()
             }
             item {
-                IngredientEntry()
+                RecipeEntry()
             }
             item {
-                IngredientEntry()
+                RecipeEntry()
             }
         }
         Divider()
@@ -141,7 +136,7 @@ fun PickedIngredientList(onAddIngredient: () -> Unit,modifier: Modifier = Modifi
                     Text(text = "10g ")
                 }
             }
-            Button(onClick = onAddIngredient) {
+            Button(onClick = onAddRecipe) {
                 Icon(Icons.Filled.Add, contentDescription = "Add")
             }
         }
@@ -149,7 +144,7 @@ fun PickedIngredientList(onAddIngredient: () -> Unit,modifier: Modifier = Modifi
 }
 
 @Composable
-fun IngredientEntry() {
+fun RecipeEntry() {
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(8.dp)
@@ -157,17 +152,12 @@ fun IngredientEntry() {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-            Image(
-                painter = painterResource(R.drawable.apple),
-                contentDescription = "Apple",
-                modifier = Modifier.size(48.dp),
-                contentScale = ContentScale.Crop
-            )
+        ) {
+            Icon(painter = painterResource(id = R.drawable.baseline_sticky_note_2_24), contentDescription = "Recipe" )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Apple", style = MaterialTheme.typography.body1)
+            Text(text = "Recipe #1", style = MaterialTheme.typography.body1)
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = "Weight: 100g")
+            Text(text = "100 kcal")
             IconButton(onClick = {}) {
                 Icon(Icons.Default.Close, contentDescription = "Remove")
             }
@@ -176,15 +166,21 @@ fun IngredientEntry() {
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun PickIngredientDialog(onCancel: () -> Unit) {
+fun RecipeEntryPrev() {
+    RecipeEntry()
+}
+
+@Composable
+fun PickRecipeDialog(onCancel: () -> Unit) {
     var selectedOption by rememberSaveable { mutableStateOf("") }
     var inputWeight by rememberSaveable { mutableStateOf("") }
 
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onCancel,
         title = {
-            Text(text = "Pick a ingredient")
+            Text(text = "Pick a recipe")
         },
         text = {
             Column {
@@ -207,7 +203,7 @@ fun PickIngredientDialog(onCancel: () -> Unit) {
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(text = "100 kcal")
-                                Text(text = "per 100 g", fontSize = 11.sp)
+                                Text(text = "21 ingredients", fontSize = 11.sp)
                             }
 
                             RadioButton(
@@ -220,13 +216,6 @@ fun PickIngredientDialog(onCancel: () -> Unit) {
                     }
                 }
                 Divider()
-                Text(text = "Weight")
-                androidx.compose.material3.OutlinedTextField(
-                    value = inputWeight,
-                    onValueChange = {inputWeight = it},
-                    label = { Text("Enter weight") },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                )
             }
 
 
@@ -247,6 +236,6 @@ fun PickIngredientDialog(onCancel: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun PickIngredientDialogPreview() {
-    PickIngredientDialog(onCancel = {})
+fun PickRecipeDialogPreview() {
+    PickRecipeDialog(onCancel = {})
 }

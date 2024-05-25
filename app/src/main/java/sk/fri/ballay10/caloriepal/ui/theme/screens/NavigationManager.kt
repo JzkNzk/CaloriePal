@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,8 +18,7 @@ import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
 import sk.fri.ballay10.caloriepal.viewModels.SummaryPageViewModel
 
 @Composable
-fun NavigationManager(mealsAndRecipesViewModel: MealsAndRecipesViewModel, summaryPageViewModel: SummaryPageViewModel) {
-    val navController = rememberNavController()
+fun NavigationManager(navController: NavHostController = rememberNavController(),mealsAndRecipesViewModel: MealsAndRecipesViewModel, summaryPageViewModel: SummaryPageViewModel) {
     var selectedDateId by remember {
         mutableIntStateOf(CalendarProvider.todayId)
     }
@@ -30,17 +30,26 @@ fun NavigationManager(mealsAndRecipesViewModel: MealsAndRecipesViewModel, summar
             startDestination = DestinationsCaloriePal.CalorieScreen.name,
             modifier = Modifier.padding(innerPadding)
             ) {
-            composable(route = DestinationsCaloriePal.CalorieScreen.name) {
-
-            }
             composable(DestinationsCaloriePal.CalorieScreen.name) { CalorieScreen(summaryPageViewModel, onDateSelect = {selectedDate ->
                 selectedDateId = selectedDate
             }) }
-            composable(DestinationsCaloriePal.RecipeScreen.name) { RecipeScreen(mealsAndRecipesViewModel, addMealToSummary = {
-                // Process summary when meal has been completed
-                summaryPageViewModel.processSummary(meal = it, id = selectedDateId)
+            composable(DestinationsCaloriePal.RecipeScreen.name) {
+                RecipeScreen(mealsAndRecipesViewModel,
+                    moveToAddingScreen = {screenType ->
+                                     if(screenType == 0) {
+                                         navController.navigate(AddingScreens.AddMeal.name)
+                                     } else {
+                                         navController.navigate(AddingScreens.AddRecipe.name)
+                                     }
+                    },
+                    addMealToSummary = {
+                    // Process summary when meal has been completed
+                    summaryPageViewModel.processSummary(meal = it, id = selectedDateId)
             }) }
             composable(DestinationsCaloriePal.IngredientScreen.name) { IngredientScreen() }
+            composable(AddingScreens.AddMeal.name) { MealAddingScreen()}
+            composable(AddingScreens.AddRecipe.name) { RecipeAddingScreen()}
+
         }
     }
 }

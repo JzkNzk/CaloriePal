@@ -71,6 +71,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CaloriePalApp(mealsAndRecipesViewModel: MealsAndRecipesViewModel, summaryPageViewModel: SummaryPageViewModel) {
-    NavigationManager(mealsAndRecipesViewModel, summaryPageViewModel)
+    NavigationManager(mealsAndRecipesViewModel = mealsAndRecipesViewModel, summaryPageViewModel = summaryPageViewModel)
 }
 

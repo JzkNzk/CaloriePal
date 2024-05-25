@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">CaloriePal</string>
+    <string name="recipe_lowercase">recipe</string>
+    <string name="meal_lowercase">meal</string>
 </resources>
