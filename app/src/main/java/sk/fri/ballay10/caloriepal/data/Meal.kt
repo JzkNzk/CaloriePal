@@ -9,7 +9,7 @@ data class Meal(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
-    val meals: List<ChoosenRecipe>,
+    val recipes: List<Recipe>,
     val recipeCount: Int,
     val totalCalories: Int,
     val totalProtein: Int,

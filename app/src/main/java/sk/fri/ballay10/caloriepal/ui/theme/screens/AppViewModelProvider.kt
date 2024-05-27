@@ -5,7 +5,9 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import sk.fri.ballay10.caloriepal.CaloriePalApplication
+import sk.fri.ballay10.caloriepal.viewModels.MealAddingViewModel
 import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
+import sk.fri.ballay10.caloriepal.viewModels.RecipeAddingViewModel
 import sk.fri.ballay10.caloriepal.viewModels.SummaryPageViewModel
 
 object AppViewModelProvider {
@@ -21,6 +23,17 @@ object AppViewModelProvider {
         initializer {
             SummaryPageViewModel(
                 caloriePalApplication().container.summaryRepository,
+            )
+        }
+        initializer {
+            RecipeAddingViewModel(
+                caloriePalApplication().container.recipeRepository,
+            )
+        }
+        initializer {
+            MealAddingViewModel(
+                caloriePalApplication().container.mealRepository,
+                caloriePalApplication().container.recipeRepository
             )
         }
     }

@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import sk.fri.ballay10.caloriepal.objects.CalendarProvider
 import sk.fri.ballay10.caloriepal.ui.theme.BottomNavBar
 import sk.fri.ballay10.caloriepal.ui.theme.screens.ingredient.IngredientScreen
+import sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes.MealAddingScreen
 import sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes.RecipeAddingScreen
 import sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes.RecipeScreen
 import sk.fri.ballay10.caloriepal.ui.theme.screens.summary.CalorieScreen
@@ -44,8 +45,12 @@ fun NavigationManager(navController: NavHostController = rememberNavController()
                 )
             }
             composable(DestinationsCaloriePal.IngredientScreen.name) { IngredientScreen() }
-            composable(AddingScreens.AddMeal.name) { sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes.MealAddingScreen() }
-            composable(AddingScreens.AddRecipe.name) { RecipeAddingScreen() }
+            composable(AddingScreens.AddMeal.name) { MealAddingScreen(returnBack = {
+                navController.popBackStack()
+            }) }
+            composable(AddingScreens.AddRecipe.name) { RecipeAddingScreen(returnBack = {
+                navController.popBackStack()
+            }) }
 
         }
     }

@@ -79,7 +79,7 @@ fun BottomNavBar(navController: NavController) {
 }
 
 @Composable
-fun EnterNameForm(modifier: Modifier = Modifier, nameOfWhat: String) {
+fun EnterNameForm(modifier: Modifier = Modifier, nameOfWhat: String, onNameChange: (String) -> Unit, value: String = "") {
     Column (
         modifier = modifier
             .shadowsPlus()
@@ -89,8 +89,10 @@ fun EnterNameForm(modifier: Modifier = Modifier, nameOfWhat: String) {
     ) {
         Text(text = "Enter $nameOfWhat name: ", fontSize = 18.sp)
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = value,
+            onValueChange = {
+                onNameChange(it)
+            },
             label = { Text(text = nameOfWhat.replaceFirstChar { it.titlecase() })},
             maxLines = 1,
             modifier = Modifier.fillMaxWidth()
@@ -99,16 +101,16 @@ fun EnterNameForm(modifier: Modifier = Modifier, nameOfWhat: String) {
 }
 
 @Composable
-fun ActionButtons() {
+fun ActionButtons(onConfirm: () -> Unit, onCancel: () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxSize()
     ) {
-        androidx.compose.material3.Button(onClick = { /*TODO*/ }, contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp, start = 40.dp, end = 40.dp), colors = ButtonDefaults.buttonColors(containerColor = colorRed1)) {
+        androidx.compose.material3.Button(onClick = { onCancel() }, contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp, start = 40.dp, end = 40.dp), colors = ButtonDefaults.buttonColors(containerColor = colorRed1)) {
             Icon(Icons.Filled.Close, contentDescription = "Cancel")
         }
-        androidx.compose.material3.Button(onClick = { /*TODO*/ }, contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp, start = 40.dp, end = 40.dp), colors = ButtonDefaults.buttonColors(containerColor = colorGreen1)) {
+        androidx.compose.material3.Button(onClick = { onConfirm() }, contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp, start = 40.dp, end = 40.dp), colors = ButtonDefaults.buttonColors(containerColor = colorGreen1)) {
             Icon(Icons.Filled.Done, contentDescription = "Done" )
         }
     }
