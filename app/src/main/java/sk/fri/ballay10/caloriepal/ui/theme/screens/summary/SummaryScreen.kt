@@ -1,4 +1,4 @@
-package sk.fri.ballay10.caloriepal.ui.theme.screens
+package sk.fri.ballay10.caloriepal.ui.theme.screens.summary
 
 import android.icu.util.Calendar
 import android.widget.DatePicker
@@ -29,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,9 +47,12 @@ import com.gigamole.composeshadowsplus.common.shadowsPlus
 import sk.fri.ballay10.caloriepal.objects.CalendarProvider
 import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
 import sk.fri.ballay10.caloriepal.viewModels.SummaryPageViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import sk.fri.ballay10.caloriepal.data.NutrientSummary
+import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
 
 @Composable
-fun CalorieScreen(viewModel: SummaryPageViewModel, onDateSelect: (Int) -> Unit) {
+fun CalorieScreen(viewModel: SummaryPageViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val scrollState = rememberScrollState()
 
     //ID of summary that will get assigned after changing date
@@ -58,7 +60,7 @@ fun CalorieScreen(viewModel: SummaryPageViewModel, onDateSelect: (Int) -> Unit) 
         mutableIntStateOf(CalendarProvider.todayId)
     }
     // Summary that is displayed on the screen based on selected date
-    val calorieSummary by viewModel.getSummaryById(summaryId).observeAsState()
+    val calorieSummary = NutrientSummary(1)
 
     var isDialogActive by rememberSaveable {
         mutableStateOf(false)
@@ -111,7 +113,6 @@ fun CalorieScreen(viewModel: SummaryPageViewModel, onDateSelect: (Int) -> Unit) 
             Divider()
             DateRow { newSummaryId ->
                 summaryId = newSummaryId
-                onDateSelect(newSummaryId)
             }
             Divider()
             NutrientSection(consumedKcal, goalKcal, totalProteins, totalFats, totalCarbs, onGoalSet = {
@@ -123,7 +124,6 @@ fun CalorieScreen(viewModel: SummaryPageViewModel, onDateSelect: (Int) -> Unit) 
                 onSetGoal = {
                     isDialogActive = false
                     //Update summary when goal is changed
-                    viewModel.processSummary(goal = it, id = summaryId)
                 },
                 onCancel = {
                     isDialogActive = false

@@ -1,15 +1,12 @@
-package sk.fri.ballay10.caloriepal.ui.theme.screens
+package sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,13 +18,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -54,7 +48,6 @@ import sk.fri.ballay10.caloriepal.R
 import sk.fri.ballay10.caloriepal.ui.theme.ActionButtons
 import sk.fri.ballay10.caloriepal.ui.theme.EnterNameForm
 import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
-import sk.fri.ballay10.caloriepal.ui.theme.colorGreen1
 import sk.fri.ballay10.caloriepal.ui.theme.colorRed1
 
 @Composable

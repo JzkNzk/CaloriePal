@@ -14,14 +14,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import sk.fri.ballay10.caloriepal.objects.CalendarProvider
 import sk.fri.ballay10.caloriepal.ui.theme.BottomNavBar
+import sk.fri.ballay10.caloriepal.ui.theme.screens.ingredient.IngredientScreen
+import sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes.RecipeAddingScreen
+import sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes.RecipeScreen
+import sk.fri.ballay10.caloriepal.ui.theme.screens.summary.CalorieScreen
 import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
 import sk.fri.ballay10.caloriepal.viewModels.SummaryPageViewModel
 
 @Composable
-fun NavigationManager(navController: NavHostController = rememberNavController(),mealsAndRecipesViewModel: MealsAndRecipesViewModel, summaryPageViewModel: SummaryPageViewModel) {
-    var selectedDateId by remember {
-        mutableIntStateOf(CalendarProvider.todayId)
-    }
+fun NavigationManager(navController: NavHostController = rememberNavController()) {
     Scaffold(
         bottomBar = { BottomNavBar(navController = navController) }
     ) { innerPadding ->
@@ -30,25 +31,21 @@ fun NavigationManager(navController: NavHostController = rememberNavController()
             startDestination = DestinationsCaloriePal.CalorieScreen.name,
             modifier = Modifier.padding(innerPadding)
             ) {
-            composable(DestinationsCaloriePal.CalorieScreen.name) { CalorieScreen(summaryPageViewModel, onDateSelect = {selectedDate ->
-                selectedDateId = selectedDate
-            }) }
+            composable(DestinationsCaloriePal.CalorieScreen.name) { CalorieScreen() }
             composable(DestinationsCaloriePal.RecipeScreen.name) {
-                RecipeScreen(mealsAndRecipesViewModel,
+                RecipeScreen(
                     moveToAddingScreen = {screenType ->
-                                     if(screenType == 0) {
-                                         navController.navigate(AddingScreens.AddMeal.name)
-                                     } else {
-                                         navController.navigate(AddingScreens.AddRecipe.name)
-                                     }
-                    },
-                    addMealToSummary = {
-                    // Process summary when meal has been completed
-                    summaryPageViewModel.processSummary(meal = it, id = selectedDateId)
-            }) }
+                        if(screenType == 0) {
+                            navController.navigate(AddingScreens.AddMeal.name)
+                        } else {
+                            navController.navigate(AddingScreens.AddRecipe.name)
+                        }
+                    }
+                )
+            }
             composable(DestinationsCaloriePal.IngredientScreen.name) { IngredientScreen() }
-            composable(AddingScreens.AddMeal.name) { MealAddingScreen()}
-            composable(AddingScreens.AddRecipe.name) { RecipeAddingScreen()}
+            composable(AddingScreens.AddMeal.name) { sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes.MealAddingScreen() }
+            composable(AddingScreens.AddRecipe.name) { RecipeAddingScreen() }
 
         }
     }

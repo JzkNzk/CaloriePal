@@ -1,46 +1,19 @@
 package sk.fri.ballay10.caloriepal.viewModels
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import sk.fri.ballay10.caloriepal.MainActivity
 import sk.fri.ballay10.caloriepal.data.Meal
 import sk.fri.ballay10.caloriepal.data.Recipe
+import sk.fri.ballay10.caloriepal.roomdb.meal.MealRepository
+import sk.fri.ballay10.caloriepal.roomdb.recipe.RecipeRepository
 
-class MealsAndRecipesViewModel : ViewModel() {
-    private val recipeDao = MainActivity.recipeDatabase.getRecipeDao()
-    private val mealDao = MainActivity.mealDatabase.getMealDao()
+class MealsAndRecipesViewModel(private val recipeRepository: RecipeRepository, private val mealRepository: MealRepository) : ViewModel() {
 
-    val recipeList : LiveData<List<Recipe>> = recipeDao.getAllRecipes()
-    val mealList : LiveData<List<Meal>> = mealDao.getAllMeals()
 
-    //Recipes functions
-
-    fun addRecipeToList(recipe: Recipe) {
-        viewModelScope.launch(Dispatchers.IO) {
-            recipeDao.addRecipe(recipe)
-        }
+    suspend fun saveRecipe() {
+        //recipeRepository.insertRecipe()
     }
 
-    fun removeRecipeFromList(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            recipeDao.deleteRecipe(id)
-        }
-    }
-
-    //Meals functions
-
-    fun addMealToList(meal: Meal) {
-        viewModelScope.launch(Dispatchers.IO) {
-            mealDao.addMeal(meal)
-        }
-    }
-
-    fun removeMealFromList(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            mealDao.deleteMeal(id)
-        }
+    suspend fun saveMeal() {
+        //mealRepository.insertMeal()
     }
 }

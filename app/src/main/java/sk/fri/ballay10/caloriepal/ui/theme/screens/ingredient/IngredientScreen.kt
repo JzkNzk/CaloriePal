@@ -1,4 +1,4 @@
-package sk.fri.ballay10.caloriepal.ui.theme.screens
+package sk.fri.ballay10.caloriepal.ui.theme.screens.ingredient
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

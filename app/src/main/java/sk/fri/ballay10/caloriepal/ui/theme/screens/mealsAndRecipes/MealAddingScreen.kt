@@ -1,11 +1,9 @@
-package sk.fri.ballay10.caloriepal.ui.theme.screens
+package sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +25,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
@@ -48,7 +45,6 @@ import sk.fri.ballay10.caloriepal.ui.theme.ActionButtons
 import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
 import sk.fri.ballay10.caloriepal.ui.theme.EnterNameForm
 import sk.fri.ballay10.caloriepal.ui.theme.colorBlue1
-import sk.fri.ballay10.caloriepal.ui.theme.colorBlue2
 
 @Composable
 fun MealAddingScreen(modifier: Modifier = Modifier) {

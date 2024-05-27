@@ -1,6 +1,5 @@
-package sk.fri.ballay10.caloriepal.ui.theme.screens
+package sk.fri.ballay10.caloriepal.ui.theme.screens.mealsAndRecipes
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -46,7 +45,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -67,14 +65,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import sk.fri.ballay10.caloriepal.data.ChoosenIngredient
-import sk.fri.ballay10.caloriepal.data.ChoosenRecipe
 import sk.fri.ballay10.caloriepal.data.Ingredient
 import sk.fri.ballay10.caloriepal.objects.IngredietList
 import sk.fri.ballay10.caloriepal.data.Meal
@@ -84,14 +76,11 @@ import sk.fri.ballay10.caloriepal.ui.theme.colorBlue1
 import sk.fri.ballay10.caloriepal.ui.theme.colorBlue2
 import sk.fri.ballay10.caloriepal.ui.theme.colorRed1
 import sk.fri.ballay10.caloriepal.ui.theme.colorRed2
+import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
 import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
 
-enum class RecipeScreen {
-    AddMeal,
-    AddRecipe,
-}
 @Composable
-fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(), addMealToSummary: (Meal) -> Unit, moveToAddingScreen: (Int) -> Unit) {
+fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppViewModelProvider.Factory), moveToAddingScreen: (Int) -> Unit) {
     var btnColor by remember {
         mutableStateOf(colorBlue1)
     }
@@ -108,11 +97,13 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(), addMealToSum
         topBar = {
             TopDescriptionBar("MEALS & RECIPES")
         },
-        floatingActionButton = {AddItemInTabButton(
+        floatingActionButton = {
+            AddItemInTabButton(
             onClick = {
                 moveToAddingScreen(activeTab)
             },
-            color = btnColor)}
+            color = btnColor)
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -129,7 +120,7 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(), addMealToSum
                     activeTab = 1
                 }
             }, onMealToSummary =  {
-                addMealToSummary(it)
+                // Adds meal to current summary
             })
         }
     }
@@ -183,33 +174,35 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
     }
 }
 
+// Displays the list of meals from database
 @Composable
 fun MealsPage(viewModel: MealsAndRecipesViewModel, onMealToSummary: (Meal) -> Unit) {
-    val mealList by viewModel.mealList.observeAsState()
-    mealList?.let {
-        LazyColumn {items(it){
-                MealTabItem(meal = it, onRemoveItem = { temp ->
-                    viewModel.removeMealFromList(temp)
-                }, onMealToSummary = { addedMeal ->
-                    onMealToSummary(addedMeal)})
-            }
-        }
-    }
+//    val mealList by viewModel.mealList.observeAsState()
+//    mealList?.let {
+//        LazyColumn {items(it){
+//                MealTabItem(meal = it, onRemoveItem = { temp ->
+//                    viewModel.removeMealFromList(temp)
+//                }, onMealToSummary = { addedMeal ->
+//                    onMealToSummary(addedMeal)})
+//            }
+//        }
+//    }
 }
 
+// Displays the list of recipes from database
 @Composable
 fun RecipesPage(viewModel: MealsAndRecipesViewModel) {
-    val recipeList by viewModel.recipeList.observeAsState()
-    recipeList?.let {
-        LazyColumn {
-            items(it){
-                RecipeTabItem(recipe = it, onRemoveItem = { temp ->
-                    viewModel.removeRecipeFromList(temp)
-                }
-                )
-            }
-        }
-    }
+//    val recipeList by viewModel.recipeList.observeAsState()
+//    recipeList?.let {
+//        LazyColumn {
+//            items(it){
+//                RecipeTabItem(recipe = it, onRemoveItem = { temp ->
+//                    viewModel.removeRecipeFromList(temp)
+//                }
+//                )
+//            }
+//        }
+//    }
 }
 
 @Composable
@@ -481,147 +474,6 @@ fun RecipeAddingScreen(onCancel: () -> Unit, onAddRecipe: (Recipe) -> Unit) {
 }
 
 @Composable
-fun MealAddingScreen(onCancel: () -> Unit, onAddMeal: (Meal) -> Unit, viewModel: MealsAndRecipesViewModel) {
-
-    val scrollState = rememberScrollState()
-
-    var chooseItemInterfaceVisible by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    var textState by remember { mutableStateOf("") }
-    val selectedOptions = remember { mutableStateListOf<ChoosenRecipe>() }
-    var totalCalories by remember { mutableDoubleStateOf(0.0) }
-    var totalProtein by remember { mutableDoubleStateOf(0.0) }
-    var totalCarbs by remember { mutableDoubleStateOf(0.0) }
-    var totalFats by remember { mutableDoubleStateOf(0.0) }
-    var createdMeal by remember {
-        mutableStateOf<Meal?>(null)
-    }
-
-    Dialog(onDismissRequest = { /*TODO*/ }, DialogProperties(
-        usePlatformDefaultWidth = false
-    )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-        ) {
-            Column (
-                modifier = Modifier
-                    .padding(36.dp)
-                    .background(Color.DarkGray)
-
-            ) {
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colorBlue1)
-                    .width(200.dp)
-                    .padding(8.dp)
-                ) {
-                    Text(text = "Add Meal", color = Color.Black, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Enter Meal name: ", color = Color.White, fontSize = 16.sp)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    TextField(
-                        value = textState,
-                        onValueChange = { textState = it },
-                        label = { Text("Meal Name", color = Color.White)},
-                        textStyle = LocalTextStyle.current.copy(color = Color.White)
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = { chooseItemInterfaceVisible = true }) {
-                        Text("Add Recipe", color = Color.White)
-                    }
-                }
-                Divider()
-                LazyColumn(modifier = Modifier
-                    .height(150.dp)
-                    .padding(8.dp)) {
-                    items(selectedOptions){item ->
-                        RecipeListEntry(recipe = item.recipe, amount = item.amount, onRemoveItem = {
-                            selectedOptions.remove(item)
-                            val amount = item.amount
-                            totalCalories -= item.recipe.totalCalories * amount
-                            totalProtein -= item.recipe.totalProtein * amount
-                            totalFats -= item.recipe.totalFats * amount
-                            totalCarbs -= item.recipe.totalCarbs * amount
-                            if (totalCalories < 0) {
-                                totalCalories = 0.0
-                            }
-                        }, removeable = true)
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Column (
-                    modifier = Modifier.padding(start = 8.dp)
-                ) {
-                    Text(text = "Total Calories: ${String.format("%.0f",totalCalories)} kcal", color = Color.White)
-                    Text(text = "Protein: ${String.format("%.1f",totalProtein)} g, Carbs: ${String.format("%.1f",totalCarbs)} g, Fats: ${String.format("%.1f",totalFats)} g", color = Color.White)
-                }
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp, 0.dp, 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Button(onClick = {onCancel()  }) {
-                        Text("Cancel", color = Color.White)
-                    }
-                    Button(onClick = {
-                        createdMeal = Meal(
-                            name = textState,
-                            meals = selectedOptions,
-                            recipeCount = selectedOptions.size,
-                            totalCalories = totalCalories.toInt(),
-                            totalProtein = totalProtein.toInt(),
-                            totalFats = totalFats.toInt(),
-                            totalCarbs = totalCarbs.toInt()
-                        )
-                        onAddMeal(createdMeal!!)
-                    }) {
-                        Text("Create Meal", color = Color.White)
-                    }
-                }
-            }
-            // Open Interface for adding ingredients to the Recipe List
-            if (chooseItemInterfaceVisible) {
-                RecipeChoosingScreen(viewModel,
-                    onClose = {
-                        chooseItemInterfaceVisible = false
-                    },
-                    onAddRecipe = {newRecipe ->
-                        chooseItemInterfaceVisible = false
-                        val existingRecipeIndex = selectedOptions.indexOfFirst { it.recipe  == newRecipe.recipe }
-                        if (existingRecipeIndex >= 0) {
-                            selectedOptions[existingRecipeIndex] = selectedOptions[existingRecipeIndex].copy(
-                                amount = (selectedOptions[existingRecipeIndex].amount) + newRecipe.amount
-                            )
-                        } else {
-                            selectedOptions.add(newRecipe)
-                        }
-                        val amount = newRecipe.amount
-                        totalCalories += newRecipe.recipe.totalCalories * amount
-                        totalProtein += newRecipe.recipe.totalProtein * amount
-                        totalFats += newRecipe.recipe.totalFats * amount
-                        totalCarbs += newRecipe.recipe.totalCarbs * amount
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun IngredientChoosingScreen(ingredients: List<Ingredient>, onClose: () -> Unit, onAddIngredient: (ChoosenIngredient) -> Unit) {
     val scrollState = rememberScrollState()
     var weightField by rememberSaveable {
@@ -706,103 +558,6 @@ fun IngredientChoosingScreen(ingredients: List<Ingredient>, onClose: () -> Unit,
                         if(selectedOption != null && weightField != "") {
                             selectedOption?.let { ChoosenIngredient(it, weightField.toInt()) }
                                 ?.let { onAddIngredient(it) }
-                        }
-                    }) {
-                        Text(text = "Add", color = Color.White)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RecipeChoosingScreen(viewModel: MealsAndRecipesViewModel, onClose: () -> Unit, onAddRecipe: (ChoosenRecipe) -> Unit) {
-    val recipeList by viewModel.recipeList.observeAsState()
-    val scrollState = rememberScrollState()
-    var amountField by rememberSaveable {
-        mutableStateOf("")
-    }
-    var selectedOption by rememberSaveable { mutableStateOf<Recipe?>(null) }
-
-    Dialog(
-        onDismissRequest = {} ,
-        DialogProperties(
-            usePlatformDefaultWidth = false
-        )
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .zIndex(10f)
-                .verticalScroll(scrollState)
-        ) {
-            Column (
-                modifier = Modifier
-                    .background(colorBlue1)
-                    .width(200.dp)
-                    .padding(8.dp)
-
-            ) {
-                Text("Choose Recipe", color = Color.White)
-            }
-            recipeList?.let {
-                LazyColumn(
-                    modifier = Modifier
-                        .background(Color.Gray)
-                        .width(200.dp)
-                        .height(400.dp),
-
-                    ) {items(it) { item ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = (item == selectedOption),
-                            onClick = { selectedOption = item }
-                        )
-                        Text(
-                            text = item.name,
-                            color = Color.White,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
-            }
-            }
-            Column (
-                modifier = Modifier
-                    .background(Color.DarkGray)
-                    .width(200.dp)
-                    .padding(8.dp)
-
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Text("Amount: ", color = Color.White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    BasicTextField(value = amountField,
-                        onValueChange = { value ->
-                            amountField = value
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .height(30.dp)
-                            .background(Color(50, 50, 50))
-                            .padding(5.dp),
-                        textStyle = LocalTextStyle.current.copy(color = Color.White),
-
-                        )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Button(onClick = { onClose()}) {
-                        Text(text = "Cancel", color = Color.White)
-                    }
-                    Button(onClick = {
-                        if(selectedOption != null && amountField != "") {
-                            selectedOption?.let { ChoosenRecipe(it, amountField.toInt()) }
-                                ?.let { onAddRecipe(it) }
                         }
                     }) {
                         Text(text = "Add", color = Color.White)

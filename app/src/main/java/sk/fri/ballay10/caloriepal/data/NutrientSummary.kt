@@ -3,7 +3,7 @@ package sk.fri.ballay10.caloriepal.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "summaries")
 data class NutrientSummary(
     @PrimaryKey(autoGenerate = false)
     val id : Int,
