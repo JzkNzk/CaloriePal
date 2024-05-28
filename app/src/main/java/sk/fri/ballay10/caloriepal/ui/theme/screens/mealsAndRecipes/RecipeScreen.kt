@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -170,7 +171,9 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
 // Displays the list of meals from database
 @Composable
 fun MealsPage(listOfMeals: List<Meal>, onMealToSummary: (Meal) -> Unit, onRemoveMeal: (Meal) -> Unit) {
-    LazyColumn {items(listOfMeals){
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {items(listOfMeals){
             MealTabItem(meal = it, onRemoveItem = { temp ->
                 onRemoveMeal(temp)
             }, onMealToSummary = { addedMeal ->
@@ -182,7 +185,9 @@ fun MealsPage(listOfMeals: List<Meal>, onMealToSummary: (Meal) -> Unit, onRemove
 // Displays the list of recipes from database
 @Composable
 fun RecipesPage(listOfRecipes: List<Recipe>, onRemoveRecipe: (Recipe) -> Unit) {
-    LazyColumn {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
         items(listOfRecipes){
             RecipeTabItem(recipe = it, onRemoveItem = { temp ->
                 onRemoveRecipe(temp)

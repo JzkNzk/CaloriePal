@@ -114,7 +114,7 @@ fun RecipeAddingScreen(viewModel: RecipeAddingViewModel = viewModel(factory = Ap
                     viewModel.addChosenIngredientToRecipe()
                     isPickDialogVisible = false
                 }
-                )
+            )
         }
     }
 }
