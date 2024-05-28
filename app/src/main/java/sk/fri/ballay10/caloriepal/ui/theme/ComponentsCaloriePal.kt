@@ -34,7 +34,6 @@ import com.gigamole.composeshadowsplus.common.shadowsPlus
 //Local
 import sk.fri.ballay10.caloriepal.ui.theme.screens.DestinationsCaloriePal
 import sk.fri.ballay10.caloriepal.R
-import kotlin.enums.EnumEntries
 
 @Composable
 fun TopDescriptionBar(title: String, bgColor: Color = Color(50,50,50)) {
@@ -105,7 +104,7 @@ fun ActionButtons(onConfirm: () -> Unit, onCancel: () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
     ) {
         androidx.compose.material3.Button(onClick = { onCancel() }, contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp, start = 40.dp, end = 40.dp), colors = ButtonDefaults.buttonColors(containerColor = colorRed1)) {
             Icon(Icons.Filled.Close, contentDescription = "Cancel")

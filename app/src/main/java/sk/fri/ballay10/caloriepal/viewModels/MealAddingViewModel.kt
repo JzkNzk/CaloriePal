@@ -160,13 +160,3 @@ fun MealDetails.toMeal(): Meal = Meal(
     totalCarbs = totalCarbs.toIntOrNull() ?: 0
 )
 
-fun Meal.toMealDetails(): MealDetails = MealDetails(
-    id = id,
-    name = name,
-    recipes = recipes.toMutableList(),
-    recipeCount = recipeCount.toString(),
-    totalCalories = totalCalories.toString(),
-    totalProtein = totalProtein.toString(),
-    totalFats = totalFats.toString(),
-    totalCarbs = totalCarbs.toString()
-)

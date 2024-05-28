@@ -1,23 +1,14 @@
 package sk.fri.ballay10.caloriepal.viewModels
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import sk.fri.ballay10.caloriepal.data.Meal
 import sk.fri.ballay10.caloriepal.data.NutrientSummary
 import sk.fri.ballay10.caloriepal.objects.CalendarProvider
 import sk.fri.ballay10.caloriepal.roomdb.summary.SummaryRepository

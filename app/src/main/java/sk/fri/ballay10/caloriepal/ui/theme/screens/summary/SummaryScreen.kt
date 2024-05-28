@@ -1,6 +1,5 @@
 package sk.fri.ballay10.caloriepal.ui.theme.screens.summary
 
-import android.icu.util.Calendar
 import android.widget.DatePicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,10 +46,7 @@ import com.gigamole.composeshadowsplus.common.shadowsPlus
 import sk.fri.ballay10.caloriepal.objects.CalendarProvider
 import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
 import sk.fri.ballay10.caloriepal.viewModels.SummaryPageViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
-import sk.fri.ballay10.caloriepal.data.NutrientSummary
-import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
 import sk.fri.ballay10.caloriepal.viewModels.SummaryDetails
 import sk.fri.ballay10.caloriepal.viewModels.SummaryUiState
 

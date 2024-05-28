@@ -36,32 +36,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gigamole.composeshadowsplus.common.shadowsPlus
 import kotlinx.coroutines.launch
 import sk.fri.ballay10.caloriepal.R
-import sk.fri.ballay10.caloriepal.data.ChoosenIngredient
-import sk.fri.ballay10.caloriepal.data.Ingredient
 import sk.fri.ballay10.caloriepal.data.Recipe
 import sk.fri.ballay10.caloriepal.ui.theme.ActionButtons
 import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
 import sk.fri.ballay10.caloriepal.ui.theme.EnterNameForm
 import sk.fri.ballay10.caloriepal.ui.theme.colorBlue1
 import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
-import sk.fri.ballay10.caloriepal.viewModels.ChoosenIngredientDetails
 import sk.fri.ballay10.caloriepal.viewModels.ChoosenRecipeDetails
 import sk.fri.ballay10.caloriepal.viewModels.ChoosenRecipeUiState
-import sk.fri.ballay10.caloriepal.viewModels.ChoosingIngredientUiState
 import sk.fri.ballay10.caloriepal.viewModels.MealAddingViewModel
 import sk.fri.ballay10.caloriepal.viewModels.MealUiState
-import sk.fri.ballay10.caloriepal.viewModels.RecipeUiState
 
 @Composable
 fun MealAddingScreen(viewModel: MealAddingViewModel = viewModel(factory = AppViewModelProvider.Factory), modifier: Modifier = Modifier, returnBack: () -> Unit) {
@@ -70,6 +65,7 @@ fun MealAddingScreen(viewModel: MealAddingViewModel = viewModel(factory = AppVie
     }
     val recipeList by viewModel.recipeList.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val verticalScroll = rememberScrollState()
 
     Scaffold (
         topBar = { TopDescriptionBar(title = "Add meal", bgColor = colorBlue1) },
@@ -78,9 +74,11 @@ fun MealAddingScreen(viewModel: MealAddingViewModel = viewModel(factory = AppVie
     ){
         Column (
             modifier = modifier
+                .verticalScroll(verticalScroll)
                 .fillMaxSize()
                 .padding(paddingValues = it)
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 0.dp)
+
 
         ) {
             EnterNameForm(
@@ -186,7 +184,7 @@ fun RecipeEntry(choosenRecipe: Recipe, onRemove: () -> Unit) {
             Text(text = choosenRecipe.name, style = MaterialTheme.typography.body1)
             Spacer(modifier = Modifier.weight(1f))
             Text(text = "${choosenRecipe.totalCalories} kcal")
-            IconButton(onClick = {}) {
+            IconButton(onClick = {onRemove()}) {
                 Icon(Icons.Default.Close, contentDescription = "Remove")
             }
         }

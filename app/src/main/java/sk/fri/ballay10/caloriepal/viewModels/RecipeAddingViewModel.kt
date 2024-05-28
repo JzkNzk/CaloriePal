@@ -33,10 +33,11 @@ class RecipeAddingViewModel(private val recipeRepository: RecipeRepository) : Vi
             ChoosingIngredientUiState(chosenIngredientDetails = chosenIngredientDetails, isEntryValid = validateChosenIngredient())
     }
 
+    //add chosen ingredient from recipe and add corresponding values to recipe
     fun addChosenIngredientToRecipe() {
         if (validateChosenIngredient()) {
             val convertedIngredient = choosingIngredientUiState.chosenIngredientDetails.toChoosenIngredient()
-            val updatedListOfChosenIngredients = recipeUiState.createdRecipe.ingredients.toMutableList() ?: mutableListOf()
+            val updatedListOfChosenIngredients = recipeUiState.createdRecipe.ingredients.toMutableList()
             updatedListOfChosenIngredients.add(convertedIngredient)
 
             val updatedCalories = recipeUiState.createdRecipe.totalCalories.toInt() + (calculateByWeight(
@@ -63,10 +64,11 @@ class RecipeAddingViewModel(private val recipeRepository: RecipeRepository) : Vi
         }
     }
 
+    //remove chosen ingredient from recipe and subtract corresponding values from recipe
     fun removeChosenIngredientFromRecipe(chosenIngredient: ChoosenIngredient) {
-        val updatedListOfChosenIngredients = recipeUiState.createdRecipe.ingredients?.toMutableList()?.apply {
+        val updatedListOfChosenIngredients = recipeUiState.createdRecipe.ingredients.toMutableList().apply {
             remove(chosenIngredient)
-        } ?: return
+        }
 
         val updatedCalories = recipeUiState.createdRecipe.totalCalories.toInt() - (calculateByWeight(
                 chosenIngredient.ingredient?.calories ?: recipeUiState.createdRecipe.totalCalories.toInt(), chosenIngredient.weight) )
@@ -141,17 +143,6 @@ fun RecipeDetails.toRecipe(): Recipe = Recipe(
     totalFats = totalFats.toIntOrNull() ?: 0,
     totalCarbs = totalCarbs.toIntOrNull() ?: 0
 )
-fun Recipe.toRecipeDetails(): RecipeDetails = RecipeDetails(
-    id = id,
-    name = name,
-    ingredients = ingredients.toMutableList(),
-    ingredientCount = ingredientCount.toString(),
-    totalCalories = totalCalories.toString(),
-    totalProtein = totalProtein.toString(),
-    totalFats = totalFats.toString(),
-    totalCarbs = totalCarbs.toString()
-)
-
 fun calculateByWeight(x:Int = 0, weight:Int): Int {
     return (x.toDouble() * (weight.toDouble()/100.0)).toInt()
 }

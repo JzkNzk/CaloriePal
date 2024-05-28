@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -65,6 +67,7 @@ fun RecipeAddingScreen(viewModel: RecipeAddingViewModel = viewModel(factory = Ap
         mutableStateOf(false)
     }
     val coroutineScope = rememberCoroutineScope()
+    val verticalScroll = rememberScrollState()
 
     Scaffold (
         topBar = { TopDescriptionBar(title = "Add recipe", bgColor = colorRed1) },
@@ -73,6 +76,7 @@ fun RecipeAddingScreen(viewModel: RecipeAddingViewModel = viewModel(factory = Ap
     ){
         Column (
             modifier
+                .verticalScroll(verticalScroll)
                 .padding(paddingValues = it)
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
         ) {
@@ -135,7 +139,7 @@ fun PickedIngredientList(
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
-            recipeUiState.createdRecipe.ingredients?.let {
+            recipeUiState.createdRecipe.ingredients.let {
                 items(it.toList()) { item ->
                     IngredientEntry(item, onRemove = {
                         removeIngredient(item)
