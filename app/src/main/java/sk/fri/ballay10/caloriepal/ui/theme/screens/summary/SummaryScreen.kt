@@ -21,6 +21,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -32,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,56 +50,19 @@ import sk.fri.ballay10.caloriepal.objects.CalendarProvider
 import sk.fri.ballay10.caloriepal.ui.theme.TopDescriptionBar
 import sk.fri.ballay10.caloriepal.viewModels.SummaryPageViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import sk.fri.ballay10.caloriepal.data.NutrientSummary
 import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
+import sk.fri.ballay10.caloriepal.viewModels.SummaryDetails
+import sk.fri.ballay10.caloriepal.viewModels.SummaryUiState
 
 
-//viewModel: SummaryPageViewModel = viewModel(factory = AppViewModelProvider.Factory)
 @Composable
-fun CalorieScreen() {
+fun CalorieScreen(viewModel: SummaryPageViewModel) {
     val scrollState = rememberScrollState()
-
-    //ID of summary that will get assigned after changing date
-    var summaryId by rememberSaveable {
-        mutableIntStateOf(CalendarProvider.todayId)
-    }
-    // Summary that is displayed on the screen based on selected date
-    val calorieSummary = NutrientSummary(1)
-
+    val corutineScope = rememberCoroutineScope()
     var isDialogActive by rememberSaveable {
         mutableStateOf(false)
-    }
-
-    // Initialized values
-    var consumedKcal by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-    var goalKcal by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-    var totalProteins by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-    var totalFats by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-    var totalCarbs by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-
-    // Get displayed values if summary has been created
-    if (calorieSummary != null) {
-        consumedKcal = calorieSummary!!.consumedCalories
-        goalKcal = calorieSummary!!.setCalories
-        totalProteins = calorieSummary!!.consumedProteins
-        totalCarbs = calorieSummary!!.consumetCarbs
-        totalFats = calorieSummary!!.consumedFats
-    } else {
-        consumedKcal = 0
-        goalKcal = 0
-        totalProteins = 0
-        totalCarbs = 0
-        totalFats = 0
     }
 
     Scaffold(
@@ -112,20 +77,24 @@ fun CalorieScreen() {
                 .verticalScroll(scrollState)
         ) {
             //START OF DATE PICKING
-            Divider()
-            DateRow { newSummaryId ->
-                summaryId = newSummaryId
-            }
-            Divider()
-            NutrientSection(consumedKcal, goalKcal, totalProteins, totalFats, totalCarbs, onGoalSet = {
+            HorizontalDivider()
+            DateRow(
+                summaryUiState = viewModel.summaryUiState,
+                onSelectedDate = {
+                    corutineScope.launch { viewModel.updateSummaryUiStateDay(it) }
+                }
+            )
+            HorizontalDivider()
+            NutrientSection(viewModel.summaryUiState.displayedSummary, onGoalSet = {
                 isDialogActive = true
             })
         }
         if (isDialogActive) {
             SetDialog(
-                onSetGoal = {
+                summaryDetails = viewModel.summaryUiState.displayedSummary,
+                onSetGoal = {item ->
                     isDialogActive = false
-                    //Update summary when goal is changed
+                    corutineScope.launch { viewModel.updateSummaryUiStateStatistics(item) }
                 },
                 onCancel = {
                     isDialogActive = false
@@ -136,30 +105,25 @@ fun CalorieScreen() {
 }
 
 @Composable
-fun DateRow(onSelectedDate: (Int) -> Unit) {
+fun DateRow(
+    summaryUiState: SummaryUiState,
+    onSelectedDate: (SummaryUiState) -> Unit,
+) {
     val context = LocalContext.current
-    val calendar = CalendarProvider.calendar
-    // State to store the selected date
-    var selectedDate by rememberSaveable { mutableStateOf("${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH)}/${calendar.get(Calendar.YEAR)}") }
-    // State to show or hide the date picker dialog
     var showDialog by rememberSaveable { mutableStateOf(false) }
-    // Selected date as unique ID
-    var selectedDateId by rememberSaveable { mutableIntStateOf(CalendarProvider.todayId) }
 
     // DatePickerDialog listener to get the selected date
     val datePickerDialog = android.app.DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-            selectedDate = "$dayOfMonth/${month + 1}/$year"
-            selectedDateId = dayOfMonth + (month + 1) *100 + year * 10000
-            onSelectedDate(selectedDateId)
+            onSelectedDate(summaryUiState.copy(selectedDay = dayOfMonth.toString(), selectedMonth = month.toString(), selectedYear = year.toString()))
         },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
+        summaryUiState.selectedYear.toInt(),
+        summaryUiState.selectedMonth.toInt(),
+        summaryUiState.selectedDay.toInt()
     ).apply {
         // Restrict to past or current date
-        datePicker.maxDate = calendar.timeInMillis
+        datePicker.maxDate = CalendarProvider.calendar.timeInMillis
     }
 
     // Show the date picker dialog when showDialog is true
@@ -176,7 +140,7 @@ fun DateRow(onSelectedDate: (Int) -> Unit) {
             .padding(2.dp)
 
     ) {
-        Text(text = selectedDate, fontSize = 16.sp)
+        Text(text = "${summaryUiState.selectedDay}/${summaryUiState.selectedMonth}/${summaryUiState.selectedYear}", fontSize = 16.sp)
         IconButton(onClick = { showDialog = true }, modifier = Modifier.padding(0.dp)) {
             Icon(painter = painterResource(id = android.R.drawable.ic_menu_my_calendar), contentDescription = "Calendar")
         }
@@ -184,7 +148,7 @@ fun DateRow(onSelectedDate: (Int) -> Unit) {
 }
 
 @Composable
-fun NutrientSection(consumedKcal: Int, goalKcal: Int, totalProteins: Int, totalFats: Int, totalCarbs: Int, onGoalSet: () -> Unit) {
+fun NutrientSection(displayedSummary: SummaryDetails, onGoalSet: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,30 +161,30 @@ fun NutrientSection(consumedKcal: Int, goalKcal: Int, totalProteins: Int, totalF
                 .height(125.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            NutrientTabBig(description = "Consumed", measure = "kcal", value = consumedKcal, false) {}
-            NutrientTabBig(description = "Goal", measure = "kcal", value = goalKcal, true, onValueSet = {
+            NutrientTabBig(description = "Consumed", measure = "kcal", value = displayedSummary.consumedCalories.toInt(), false) {}
+            NutrientTabBig(description = "Goal", measure = "kcal", value = displayedSummary.setCalories.toInt(), true, onValueSet = {
                 onGoalSet()
             })
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Divider()
+        HorizontalDivider()
         Row {
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = "Nutrient tracking", fontSize = 28.sp, fontWeight = FontWeight.Bold)
         }
         Row {
             Spacer(modifier = Modifier.width(16.dp))
-            NutrientTabSmallTrackable(macronutrient = "Calories", amount = consumedKcal, trackedAmount = goalKcal, bgColor = Color.White)
+            NutrientTabSmallTrackable(macronutrient = "Calories", amount = displayedSummary.consumedCalories.toInt(), trackedAmount = displayedSummary.setCalories.toInt(), bgColor = Color.White)
         }
         Row {
             Spacer(modifier = Modifier.width(16.dp))
             NutrientTabSmall(
-                macronutrient = "Proteins", amount = totalProteins, bgColor = Color(194, 160, 160, 255)
+                macronutrient = "Proteins", amount = displayedSummary.consumedProteins.toInt(), bgColor = Color(194, 160, 160, 255)
             )
         }
         Row {
             Spacer(modifier = Modifier.width(16.dp))
-            NutrientTabSmall(macronutrient = "Fats", amount = totalFats, bgColor = Color(
+            NutrientTabSmall(macronutrient = "Fats", amount = displayedSummary.consumedFats.toInt(), bgColor = Color(
                 230,
                 211,
                 155,
@@ -230,7 +194,7 @@ fun NutrientSection(consumedKcal: Int, goalKcal: Int, totalProteins: Int, totalF
         }
         Row {
             Spacer(modifier = Modifier.width(16.dp))
-            NutrientTabSmall(macronutrient = "Carbohydrates", amount = totalCarbs, bgColor = Color(
+            NutrientTabSmall(macronutrient = "Carbohydrates", amount = displayedSummary.consumedFats.toInt(), bgColor = Color(
                 241,
                 129,
                 129,
@@ -317,7 +281,7 @@ fun NutrientTabSmallTrackable(macronutrient: String, amount: Int, trackedAmount:
 }
 
 @Composable
-fun SetDialog(onSetGoal: (Int) -> Unit, onCancel: () -> Unit) {
+fun SetDialog(summaryDetails: SummaryDetails, onSetGoal: (SummaryDetails) -> Unit, onCancel: () -> Unit) {
     var goal by rememberSaveable { mutableStateOf("") }
     val isValidInput = goal.toIntOrNull() != null
 
@@ -340,7 +304,7 @@ fun SetDialog(onSetGoal: (Int) -> Unit, onCancel: () -> Unit) {
             TextButton(
                 onClick = {
                     if (isValidInput) {
-                        onSetGoal(goal.toInt())
+                        onSetGoal(summaryDetails.copy(setCalories = goal))
                     }
                 },
                 enabled = isValidInput

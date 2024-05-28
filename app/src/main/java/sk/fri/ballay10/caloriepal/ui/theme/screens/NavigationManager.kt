@@ -7,11 +7,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import sk.fri.ballay10.caloriepal.objects.CalendarProvider
 import sk.fri.ballay10.caloriepal.ui.theme.BottomNavBar
 import sk.fri.ballay10.caloriepal.ui.theme.screens.ingredient.IngredientScreen
@@ -23,7 +26,9 @@ import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
 import sk.fri.ballay10.caloriepal.viewModels.SummaryPageViewModel
 
 @Composable
-fun NavigationManager(navController: NavHostController = rememberNavController()) {
+fun NavigationManager(navController: NavHostController = rememberNavController(), summaryViewModel: SummaryPageViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         bottomBar = { BottomNavBar(navController = navController) }
     ) { innerPadding ->
@@ -32,7 +37,7 @@ fun NavigationManager(navController: NavHostController = rememberNavController()
             startDestination = DestinationsCaloriePal.CalorieScreen.name,
             modifier = Modifier.padding(innerPadding)
             ) {
-            composable(DestinationsCaloriePal.CalorieScreen.name) { CalorieScreen() }
+            composable(DestinationsCaloriePal.CalorieScreen.name) { CalorieScreen(summaryViewModel) }
             composable(DestinationsCaloriePal.RecipeScreen.name) {
                 RecipeScreen(
                     moveToAddingScreen = {screenType ->
@@ -41,6 +46,10 @@ fun NavigationManager(navController: NavHostController = rememberNavController()
                         } else {
                             navController.navigate(AddingScreens.AddRecipe.name)
                         }
+                    },
+                    summaryDetails = summaryViewModel.summaryUiState.displayedSummary,
+                    onMealToSummary = {summaryDetails ->
+                        coroutineScope.launch { summaryViewModel.updateSummaryUiStateStatistics(summaryDetails) }
                     }
                 )
             }

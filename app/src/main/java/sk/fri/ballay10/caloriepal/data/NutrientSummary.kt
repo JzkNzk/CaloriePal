@@ -11,5 +11,5 @@ data class NutrientSummary(
     val consumedCalories :Int = 0,
     val consumedFats : Int = 0,
     val consumedProteins : Int = 0,
-    val consumetCarbs : Int = 0
+    val consumedCarbs : Int = 0
 )

@@ -84,10 +84,11 @@ import sk.fri.ballay10.caloriepal.ui.theme.colorRed1
 import sk.fri.ballay10.caloriepal.ui.theme.colorRed2
 import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
 import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
+import sk.fri.ballay10.caloriepal.viewModels.SummaryDetails
 import sk.fri.ballay10.caloriepal.viewModels.calculateByWeight
 
 @Composable
-fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppViewModelProvider.Factory), moveToAddingScreen: (Int) -> Unit) {
+fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppViewModelProvider.Factory), moveToAddingScreen: (Int) -> Unit, summaryDetails: SummaryDetails, onMealToSummary: (SummaryDetails) -> Unit) {
     Scaffold(
         topBar = {
             TopDescriptionBar("MEALS & RECIPES")
@@ -112,8 +113,12 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppVi
                 if (it == 1) {
                     viewModel.updatePageUiState(1)
                 }
-            }, onMealToSummary =  {
-                // Adds meal to current summary
+            }, onMealToSummary =  {meal ->
+                onMealToSummary(summaryDetails.copy(
+                    consumedFats = meal.totalFats.toString(),
+                    consumedCarbs = meal.totalCarbs.toString(),
+                    consumedProteins = meal.totalProtein.toString(),
+                    consumedCalories = meal.totalCalories.toString()))
             })
         }
     }
@@ -129,7 +134,7 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
 
     Column {
         val pagerState = rememberPagerState(pageCount = {2})
-        val corutineScope = rememberCoroutineScope()
+
         TabRow(
             selectedTabIndex = pagerState.currentPage,
             backgroundColor = Color(130,130,130)
@@ -138,7 +143,7 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
                 selected = pagerState.currentPage == 0,
                 text = { Text(text = "Meals", color = Color(255,255,255))},
                 onClick = {
-                    corutineScope.launch {
+                    coroutineScope.launch {
                         onPageChange(0)
                         pagerState.animateScrollToPage(0)
                     }
@@ -148,7 +153,7 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
                 selected = pagerState.currentPage == 1,
                 text = { Text(text = "Recipes", color = Color(255,255,255))},
                 onClick = {
-                    corutineScope.launch {
+                    coroutineScope.launch {
                         onPageChange(1)
                         pagerState.animateScrollToPage(1)
                     }
@@ -164,7 +169,7 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
                             onMealToSummary(addedMeal)
                         },
                         onRemoveMeal = {
-                            corutineScope.launch {
+                            coroutineScope.launch {
                                 viewModel.deleteMeal(it)
                             }
                         }
@@ -174,7 +179,7 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
                     RecipesPage(
                         recipeList.recipeList,
                         onRemoveRecipe = {
-                            corutineScope.launch {
+                            coroutineScope.launch {
                                 viewModel.deleteRecipe(it)
                             }
                         }
