@@ -54,14 +54,26 @@ class SummaryPageViewModel(private val summaryRepository: SummaryRepository) : V
 
     }
     suspend fun updateSummaryUiStateStatistics(updatedSummary: SummaryDetails) {
-        val newSummary = SummaryDetails(
-            id = updatedSummary.id,
-            setCalories = updatedSummary.setCalories,
-            consumedCalories = (updatedSummary.consumedCalories.toInt() + summaryUiState.displayedSummary.consumedCalories.toInt()).toString(),
-            consumedFats = (updatedSummary.consumedFats.toInt() + summaryUiState.displayedSummary.consumedFats.toInt()).toString(),
-            consumedCarbs = (updatedSummary.consumedCarbs.toInt() + summaryUiState.displayedSummary.consumedCarbs.toInt()).toString(),
-            consumedProteins = (updatedSummary.consumedProteins.toInt() + summaryUiState.displayedSummary.consumedProteins.toInt()).toString()
-        )
+        val newSummary: SummaryDetails
+        if (updatedSummary.setCalories != summaryUiState.displayedSummary.setCalories) {
+            newSummary = SummaryDetails(
+                setCalories = updatedSummary.setCalories,
+                consumedCalories = summaryUiState.displayedSummary.consumedCalories,
+                consumedFats = summaryUiState.displayedSummary.consumedFats,
+                consumedCarbs = summaryUiState.displayedSummary.consumedCarbs,
+                consumedProteins = summaryUiState.displayedSummary.consumedProteins
+            )
+        } else {
+            newSummary = SummaryDetails(
+                id = updatedSummary.id,
+                setCalories = updatedSummary.setCalories,
+                consumedCalories = (updatedSummary.consumedCalories.toInt() + summaryUiState.displayedSummary.consumedCalories.toInt()).toString(),
+                consumedFats = (updatedSummary.consumedFats.toInt() + summaryUiState.displayedSummary.consumedFats.toInt()).toString(),
+                consumedCarbs = (updatedSummary.consumedCarbs.toInt() + summaryUiState.displayedSummary.consumedCarbs.toInt()).toString(),
+                consumedProteins = (updatedSummary.consumedProteins.toInt() + summaryUiState.displayedSummary.consumedProteins.toInt()).toString()
+            )
+        }
+
         summaryUiState = summaryUiState.copy(displayedSummary = newSummary)
         val currentId = summaryUiState.displayedSummary.id.toInt()
         if (checkIfSummaryExists(currentId)) {
