@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
@@ -40,10 +41,14 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -66,6 +71,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
+import sk.fri.ballay10.caloriepal.R
 import sk.fri.ballay10.caloriepal.data.ChoosenIngredient
 import sk.fri.ballay10.caloriepal.data.Ingredient
 import sk.fri.ballay10.caloriepal.objects.IngredietList
@@ -78,21 +84,10 @@ import sk.fri.ballay10.caloriepal.ui.theme.colorRed1
 import sk.fri.ballay10.caloriepal.ui.theme.colorRed2
 import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
 import sk.fri.ballay10.caloriepal.viewModels.MealsAndRecipesViewModel
+import sk.fri.ballay10.caloriepal.viewModels.calculateByWeight
 
 @Composable
 fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppViewModelProvider.Factory), moveToAddingScreen: (Int) -> Unit) {
-    var btnColor by remember {
-        mutableStateOf(colorBlue1)
-    }
-    // Tracks which tab is active
-    var activeTab by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-    //Tracks if user is creating new entry
-    var addingState by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     Scaffold(
         topBar = {
             TopDescriptionBar("MEALS & RECIPES")
@@ -100,9 +95,9 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppVi
         floatingActionButton = {
             AddItemInTabButton(
             onClick = {
-                moveToAddingScreen(activeTab)
+                moveToAddingScreen(viewModel.pageUiState.currentPage)
             },
-            color = btnColor)
+            color = viewModel.pageUiState.color)
         }
     ) { innerPadding ->
         Column(
@@ -112,12 +107,10 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppVi
         ) {
             ChoosableTabs(viewModel, onPageChange = {
                 if (it == 0) {
-                    btnColor = colorBlue1
-                    activeTab = 0
+                    viewModel.updatePageUiState(0)
                 }
                 if (it == 1) {
-                    btnColor = colorRed1
-                    activeTab = 1
+                    viewModel.updatePageUiState(1)
                 }
             }, onMealToSummary =  {
                 // Adds meal to current summary
@@ -130,6 +123,10 @@ fun RecipeScreen(viewModel: MealsAndRecipesViewModel = viewModel(factory = AppVi
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Unit, onMealToSummary: (Meal) -> Unit) {
+    val recipeList by viewModel.recipeListUiState.collectAsState()
+    val mealList by viewModel.mealListUiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
     Column {
         val pagerState = rememberPagerState(pageCount = {2})
         val corutineScope = rememberCoroutineScope()
@@ -161,13 +158,27 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
         HorizontalPager(state = pagerState) { page ->
             when (page) {
                 0 -> {
-                    MealsPage(viewModel, onMealToSummary = { addedMeal ->
-                        onMealToSummary(addedMeal)
-                    })
-
+                    MealsPage(
+                        mealList.mealList,
+                        onMealToSummary = { addedMeal ->
+                            onMealToSummary(addedMeal)
+                        },
+                        onRemoveMeal = {
+                            corutineScope.launch {
+                                viewModel.deleteMeal(it)
+                            }
+                        }
+                    )
                 }
                 1 -> {
-                    RecipesPage(viewModel)
+                    RecipesPage(
+                        recipeList.recipeList,
+                        onRemoveRecipe = {
+                            corutineScope.launch {
+                                viewModel.deleteRecipe(it)
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -176,40 +187,31 @@ fun ChoosableTabs(viewModel: MealsAndRecipesViewModel, onPageChange: (Int) -> Un
 
 // Displays the list of meals from database
 @Composable
-fun MealsPage(viewModel: MealsAndRecipesViewModel, onMealToSummary: (Meal) -> Unit) {
-//    val mealList by viewModel.mealList.observeAsState()
-//    mealList?.let {
-//        LazyColumn {items(it){
-//                MealTabItem(meal = it, onRemoveItem = { temp ->
-//                    viewModel.removeMealFromList(temp)
-//                }, onMealToSummary = { addedMeal ->
-//                    onMealToSummary(addedMeal)})
-//            }
-//        }
-//    }
+fun MealsPage(listOfMeals: List<Meal>, onMealToSummary: (Meal) -> Unit, onRemoveMeal: (Meal) -> Unit) {
+    LazyColumn {items(listOfMeals){
+            MealTabItem(meal = it, onRemoveItem = { temp ->
+                onRemoveMeal(temp)
+            }, onMealToSummary = { addedMeal ->
+                onMealToSummary(addedMeal)})
+        }
+    }
 }
 
 // Displays the list of recipes from database
 @Composable
-fun RecipesPage(viewModel: MealsAndRecipesViewModel) {
-//    val recipeList by viewModel.recipeList.observeAsState()
-//    recipeList?.let {
-//        LazyColumn {
-//            items(it){
-//                RecipeTabItem(recipe = it, onRemoveItem = { temp ->
-//                    viewModel.removeRecipeFromList(temp)
-//                }
-//                )
-//            }
-//        }
-//    }
+fun RecipesPage(listOfRecipes: List<Recipe>, onRemoveRecipe: (Recipe) -> Unit) {
+    LazyColumn {
+        items(listOfRecipes){
+            RecipeTabItem(recipe = it, onRemoveItem = { temp ->
+                onRemoveRecipe(temp)
+            }
+            )
+        }
+    }
 }
 
 @Composable
-fun RecipeTabItem(recipe: Recipe, onRemoveItem: (Int) -> Unit) {
-    val savedRecipe by remember {
-        mutableStateOf(recipe)
-    }
+fun RecipeTabItem(recipe: Recipe, onRemoveItem: (Recipe) -> Unit) {
     var isRecipeWindowVisible by rememberSaveable {
         mutableStateOf(false)
     }
@@ -251,21 +253,21 @@ fun RecipeTabItem(recipe: Recipe, onRemoveItem: (Int) -> Unit) {
                 verticalArrangement = Arrangement.Center
 
             ) {
-                IconButton(onClick = {onRemoveItem(recipe.id)}) {
+                IconButton(onClick = {onRemoveItem(recipe)}) {
                     Icon(Icons.Filled.Delete, contentDescription = "Delete")
                 }
             }
         }
     }
     if (isRecipeWindowVisible) {
-        RecipeShowWindow(recipe = savedRecipe, onExit = {
+        RecipeShowWindow(recipe = recipe, onExit = {
             isRecipeWindowVisible = false
         })
     }
 }
 
 @Composable
-fun MealTabItem(meal: Meal, onRemoveItem: (Int) -> Unit, onMealToSummary: (Meal) -> Unit) {
+fun MealTabItem(meal: Meal, onRemoveItem: (Meal) -> Unit, onMealToSummary: (Meal) -> Unit) {
     var isRecipeWindowVisible by rememberSaveable {
         mutableStateOf(false)
     }
@@ -308,7 +310,7 @@ fun MealTabItem(meal: Meal, onRemoveItem: (Int) -> Unit, onMealToSummary: (Meal)
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Center
             ) {
-                IconButton(onClick = {onRemoveItem(meal.id)}) {
+                IconButton(onClick = {onRemoveItem(meal)}) {
                     Icon(Icons.Filled.Delete, contentDescription = "Delete" )
                 }
             }
@@ -332,280 +334,120 @@ fun AddItemInTabButton(onClick: () -> Unit, color: Color) {
     }
 }
 
-@Composable
-fun IngredientChoosingScreen(ingredients: List<Ingredient>, onClose: () -> Unit, onAddIngredient: (ChoosenIngredient) -> Unit) {
-    val scrollState = rememberScrollState()
-    var weightField by rememberSaveable {
-        mutableStateOf("")
-    }
-    var selectedOption by rememberSaveable { mutableStateOf<Ingredient?>(null) }
-
-    Dialog(
-        onDismissRequest = {} ,
-        DialogProperties(
-            usePlatformDefaultWidth = false
-        )
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .zIndex(10f)
-                .verticalScroll(scrollState)
-        ) {
-            Column (
-                modifier = Modifier
-                    .background(Color.DarkGray)
-                    .width(200.dp)
-                    .padding(8.dp)
-
-            ) {
-                Text("Choose Ingredient", color = Color.White)
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .background(Color.Gray)
-                    .width(200.dp)
-                    .height(400.dp),
-
-                ) {items(ingredients) { item ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = (item == selectedOption),
-                        onClick = { selectedOption = item }
-                    )
-                    Text(
-                        text = item.name,
-                        color = Color.White,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
-
-            }
-            Column (
-                modifier = Modifier
-                    .background(Color.DarkGray)
-                    .width(200.dp)
-                    .padding(8.dp)
-
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Text("Weight (g): ", color = Color.White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    BasicTextField(value = weightField,
-                        onValueChange = { value ->
-                            weightField = value
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .height(30.dp)
-                            .background(Color(50, 50, 50))
-                            .padding(5.dp),
-                        textStyle = LocalTextStyle.current.copy(color = Color.White),
-
-                        )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Button(onClick = { onClose()}) {
-                        Text(text = "Cancel", color = Color.White)
-                    }
-                    Button(onClick = {
-                        if(selectedOption != null && weightField != "") {
-                            selectedOption?.let { ChoosenIngredient(it, weightField.toInt()) }
-                                ?.let { onAddIngredient(it) }
-                        }
-                    }) {
-                        Text(text = "Add", color = Color.White)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun BasicListEntry(ingredient: Ingredient, weight: Int, onRemoveItem: () -> Unit, removeable: Boolean) {
-    Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(Color.White)
-            .padding(8.dp)) {
-        Image(
-            painter = painterResource(id = ingredient.imageRes),
-            contentDescription = ingredient.name,
-            modifier = Modifier.size(48.dp),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = ingredient.name)
-        Spacer(modifier = Modifier.weight(1f))
-        Text(text = "Grams: $weight g")
-        if (removeable) {
-            IconButton(onClick = {onRemoveItem()}) {
-                Icon(Icons.Default.Close, contentDescription = "Remove")
-            }
-        }
-    }
-    Divider()
-}
-
-@Composable
-fun RecipeListEntry(recipe: Recipe, amount: Int, onRemoveItem: () -> Unit, removeable: Boolean) {
-    Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(Color.White)
-            .padding(8.dp)) {
-        Text(text = recipe.name)
-        Spacer(modifier = Modifier.weight(1f))
-        Text(text = "Amount: $amount")
-        if (removeable) {
-            IconButton(onClick = {onRemoveItem()}) {
-                Icon(Icons.Default.Close, contentDescription = "Remove")
-            }
-        }
-    }
-    Divider()
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeShowWindow(recipe: Recipe, onExit: () -> Unit) {
     val scrollState = rememberScrollState()
 
-    Dialog(onDismissRequest = { onExit() }, DialogProperties(
-        usePlatformDefaultWidth = false
-    )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Column (
-                modifier = Modifier
-                    .padding(36.dp)
-                    .background(Color.DarkGray)
-                    .verticalScroll(scrollState)
-
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(colorRed1)
-                        .width(200.dp)
-                        .padding(8.dp)
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onExit,
+        title = {
+            Text(text = "Recipe Details")
+        },
+        text = {
+            Column {
+                Row (
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Recipe", color = Color.Black, fontWeight = FontWeight.Bold)
+                    Text(text = "Ingredient name")
+                    Text(text = "Weight")
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = recipe.name,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Ingredients:", color = Color.White)
+                LazyColumn(
+                    modifier = Modifier.height(300.dp)
+                ) {
+                    items(recipe.ingredients) {ingredient ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            ingredient.ingredient?.let { painterResource(id = it.imageRes) }
+                                ?.let { Image(painter = it, contentDescription = "Ingredient", modifier = Modifier.size(48.dp),
+                                    contentScale = ContentScale.Crop) }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            ingredient.ingredient?.let { Text(text = it.name) }
+                            Column(
+                                horizontalAlignment = Alignment.End,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(text = "${ingredient.weight} g")
+                                Text(text = "${calculateByWeight(ingredient.ingredient?.calories ?: 0, ingredient.weight)} calories", fontSize = 11.sp)
+                            }
+                        }
+                        HorizontalDivider()
+                    }
                 }
                 Divider()
-//                LazyColumn(modifier = Modifier
-//                    .height(250.dp)
-//                    .padding(8.dp)) {
-//                    items(recipe.ingredients){item ->
-//                        BasicListEntry(ingredient = item.ingredient, weight = item.weight, onRemoveItem = {}, removeable = false)
-//                        }
-//                    }
-//                    Spacer(modifier = Modifier.height(16.dp))
-//                    Column (
-//                        modifier = Modifier.padding(start = 8.dp)
-//                    ) {
-//                        Text(text = "Total Calories: ${recipe.totalCalories} kcal", color = Color.White)
-//                        Text(text = "Protein: ${recipe.totalProtein} g, Carbs: ${recipe.totalCarbs} g, Fats: ${recipe.totalFats} g", color = Color.White)
-//                    }
-//                    Row(modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(8.dp, 0.dp, 8.dp), horizontalArrangement = Arrangement.Center) {
-//                        Button(onClick = {onExit()  }) {
-//                            Text("Exit", color = Color.White)
-//                        }
-//                    }
-//                }
-//
-//            }
             }
+        },
+        confirmButton = {
+        },
+        dismissButton = {
+            TextButton(onClick = onExit) {
+                Text("Cancel")
             }
-        }
+        },
+    )
 }
+
+
 
 @Composable
 fun MealShowWindow(meal: Meal, onExit: () -> Unit) {
     val scrollState = rememberScrollState()
 
-    Dialog(onDismissRequest = { onExit() }, DialogProperties(
-        usePlatformDefaultWidth = false
-    )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-        ) {
-            Column (
-                modifier = Modifier
-                    .padding(36.dp)
-                    .background(Color.DarkGray)
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onExit,
+        title = {
+            Text(text = "Recipe Details")
+        },
+        text = {
+            Column {
+                Row (
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Recipe name")
+                    Text(text = "Calories")
+                }
 
-            ) {
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colorBlue1)
-                    .width(200.dp)
-                    .padding(8.dp)
+                LazyColumn(
+                    modifier = Modifier.height(300.dp)
                 ) {
-                    Text(text = "Meal", color = Color.Black, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = meal.name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Recipes:", color = Color.White)
-                }
-                Divider()
-                LazyColumn(modifier = Modifier
-                    .height(150.dp)
-                    .padding(8.dp)) {
-//                    items(meal.meals){item ->
-//                        RecipeListEntry(recipe = item.recipe, amount = item.amount, onRemoveItem = {}, removeable = false)
-//                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Column (
-                    modifier = Modifier.padding(start = 8.dp)
-                ) {
-                    Text(text = "Total Calories: ${meal.totalCalories} kcal", color = Color.White)
-                    Text(text = "Protein: ${meal.totalProtein} g, Carbs: ${meal.totalCarbs} g, Fats: ${meal.totalFats} g", color = Color.White)
-                }
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp, 0.dp, 8.dp), horizontalArrangement = Arrangement.Center) {
-                    Button(onClick = {onExit()  }) {
-                        Text("Exit", color = Color.White)
+                    items(meal.recipes) {recipe ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Icon(painter = painterResource(id = R.drawable.baseline_sticky_note_2_24), contentDescription = "Recipe" )
+                            Text(text = recipe.name)
+                            Column(
+                                horizontalAlignment = Alignment.End,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(text = "${recipe.totalCalories} kcal")
+                            }
+                        }
+                        HorizontalDivider()
                     }
                 }
+                HorizontalDivider()
             }
-
-        }
-    }
+        },
+        confirmButton = {
+        },
+        dismissButton = {
+            TextButton(onClick = onExit) {
+                Text("Cancel")
+            }
+        },
+        )
 }
 
 

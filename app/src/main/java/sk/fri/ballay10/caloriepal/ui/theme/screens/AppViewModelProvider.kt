@@ -20,11 +20,11 @@ object AppViewModelProvider {
             )
         }
 
-        initializer {
-            SummaryPageViewModel(
-                caloriePalApplication().container.summaryRepository,
-            )
-        }
+//        initializer {
+//            SummaryPageViewModel(
+//                caloriePalApplication().container.summaryRepository,
+//            )
+//        }
         initializer {
             RecipeAddingViewModel(
                 caloriePalApplication().container.recipeRepository,

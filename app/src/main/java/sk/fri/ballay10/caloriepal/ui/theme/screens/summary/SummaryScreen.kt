@@ -51,8 +51,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import sk.fri.ballay10.caloriepal.data.NutrientSummary
 import sk.fri.ballay10.caloriepal.ui.theme.screens.AppViewModelProvider
 
+
+//viewModel: SummaryPageViewModel = viewModel(factory = AppViewModelProvider.Factory)
 @Composable
-fun CalorieScreen(viewModel: SummaryPageViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun CalorieScreen() {
     val scrollState = rememberScrollState()
 
     //ID of summary that will get assigned after changing date

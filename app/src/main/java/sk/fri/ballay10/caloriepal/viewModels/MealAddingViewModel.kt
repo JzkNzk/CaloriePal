@@ -43,7 +43,7 @@ class MealAddingViewModel(
     }
 
     private fun validateMeal(): Boolean {
-        return mealUiState.createdMeal.name.isNotBlank() && mealUiState.createdMeal.recipes.size != 0
+        return mealUiState.createdMeal.name.isNotBlank() && mealUiState.createdMeal.recipes.isNotEmpty()
     }
 
     fun updateChoosingUiState(chosenRecipeDetails: ChoosenRecipeDetails) {
@@ -158,4 +158,15 @@ fun MealDetails.toMeal(): Meal = Meal(
     totalProtein = totalProtein.toIntOrNull() ?: 0,
     totalFats = totalFats.toIntOrNull() ?: 0,
     totalCarbs = totalCarbs.toIntOrNull() ?: 0
+)
+
+fun Meal.toMealDetails(): MealDetails = MealDetails(
+    id = id,
+    name = name,
+    recipes = recipes.toMutableList(),
+    recipeCount = recipeCount.toString(),
+    totalCalories = totalCalories.toString(),
+    totalProtein = totalProtein.toString(),
+    totalFats = totalFats.toString(),
+    totalCarbs = totalCarbs.toString()
 )

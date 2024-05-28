@@ -25,7 +25,7 @@ class RecipeAddingViewModel(private val recipeRepository: RecipeRepository) : Vi
     }
 
     private fun validateRecipe(): Boolean {
-        return recipeUiState.createdRecipe.name.isNotBlank()
+        return recipeUiState.createdRecipe.name.isNotBlank() && recipeUiState.createdRecipe.ingredients.isNotEmpty()
     }
 
     fun updateChoosingUiState(chosenIngredientDetails: ChoosenIngredientDetails) {
@@ -36,7 +36,7 @@ class RecipeAddingViewModel(private val recipeRepository: RecipeRepository) : Vi
     fun addChosenIngredientToRecipe() {
         if (validateChosenIngredient()) {
             val convertedIngredient = choosingIngredientUiState.chosenIngredientDetails.toChoosenIngredient()
-            val updatedListOfChosenIngredients = recipeUiState.createdRecipe.ingredients?.toMutableList() ?: mutableListOf()
+            val updatedListOfChosenIngredients = recipeUiState.createdRecipe.ingredients.toMutableList() ?: mutableListOf()
             updatedListOfChosenIngredients.add(convertedIngredient)
 
             val updatedCalories = recipeUiState.createdRecipe.totalCalories.toInt() + (calculateByWeight(
@@ -118,7 +118,7 @@ data class ChoosenIngredientDetails(
 data class RecipeDetails(
     val id: Int = 0,
     val name: String = "",
-    val ingredients: MutableList<ChoosenIngredient>? = null,
+    val ingredients: MutableList<ChoosenIngredient> = mutableListOf(),
     val ingredientCount: String = "0",
     val totalCalories: String = "0",
     val totalProtein: String = "0",
@@ -134,12 +134,22 @@ fun ChoosenIngredientDetails.toChoosenIngredient() : ChoosenIngredient = Choosen
 fun RecipeDetails.toRecipe(): Recipe = Recipe(
     id = id,
     name = name,
-    ingredients = ingredients?.toList(),
+    ingredients = ingredients.toList(),
     ingredientCount = ingredientCount.toIntOrNull() ?: 0,
     totalCalories = totalCalories.toIntOrNull() ?: 0,
     totalProtein = totalProtein.toIntOrNull() ?: 0,
     totalFats = totalFats.toIntOrNull() ?: 0,
     totalCarbs = totalCarbs.toIntOrNull() ?: 0
+)
+fun Recipe.toRecipeDetails(): RecipeDetails = RecipeDetails(
+    id = id,
+    name = name,
+    ingredients = ingredients.toMutableList(),
+    ingredientCount = ingredientCount.toString(),
+    totalCalories = totalCalories.toString(),
+    totalProtein = totalProtein.toString(),
+    totalFats = totalFats.toString(),
+    totalCarbs = totalCarbs.toString()
 )
 
 fun calculateByWeight(x:Int = 0, weight:Int): Int {
